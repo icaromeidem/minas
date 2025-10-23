@@ -1,0 +1,8 @@
+README.md
+pyproject.toml
+setup.cfg
+src/minas.egg-info/PKG-INFO
+src/minas.egg-info/SOURCES.txt
+src/minas.egg-info/dependency_links.txt
+src/minas.egg-info/requires.txt
+src/minas.egg-info/top_level.txt
