@@ -83,10 +83,14 @@ Jordi, C., Gebran, M., Carrasco, J. M., et al. (2010). *Gaia broad band photomet
 
 ### Como Usar
 
-Instale o pacote em modo editável:
+
+Instale o pacote normalmente:
 ```bash
-pip install -e /caminho/para/minas
+pip install /caminho/para/minas
 ```
+
+> **Nota:**
+> Para ambientes modernos, a instalação editável (`-e`) pode não funcionar devido a mudanças no pip/setuptools. Prefira a instalação padrão, a menos que você realmente precise editar o código frequentemente.
 
 Importe no seu código:
 ```python
@@ -195,10 +199,14 @@ Jordi, C., Gebran, M., Carrasco, J. M., et al. (2010). *Gaia broad band photomet
 
 ### How to Use
 
-Install the package in editable mode:
+
+Install the package (recommended):
 ```bash
-pip install -e /path/to/minas
+pip install /path/to/minas
 ```
+
+> **Note:**
+> In modern Python environments, editable mode (`-e`) may not work due to pip/setuptools changes. Prefer standard installation unless you really need live code editing.
 
 Import in your code:
 ```python
