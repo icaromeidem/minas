@@ -6,3 +6,4 @@ tqdm
 seaborn
 matplotlib
 xgboost
+ipywidgets
