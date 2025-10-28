@@ -12,13 +12,12 @@ except ImportError:
     XGBClassifier = None
 
 
-## Removido: definição duplicada da função create_model
-def create_model(model_type, hp_combination=None, random_state=42):
+def create_model(model_type, hp_combination = None):
     if model_type == "RF-REG":
         if hp_combination:
             n_features, n_trees, min_samples_leaf, bootstrap, max_features = hp_combination
             FeatureSelector = RFE(
-                estimator=DecisionTreeRegressor(random_state=random_state),
+                estimator=DecisionTreeRegressor(),
                 n_features_to_select=n_features,
                 verbose=0,
                 step=100,
@@ -28,18 +27,17 @@ def create_model(model_type, hp_combination=None, random_state=42):
                 bootstrap=bootstrap,
                 min_samples_leaf=min_samples_leaf,
                 max_features=max_features,
-                random_state=random_state
             )
         else:
-            FeatureSelector = RFE(estimator=DecisionTreeRegressor(random_state=random_state))
-            RF = RandomForestRegressor(random_state=random_state)
+            FeatureSelector = RFE(estimator=DecisionTreeRegressor())
+            RF = RandomForestRegressor()
         pipeline = Pipeline(steps=[("Feature Selector", FeatureSelector), ("Model", RF)])
 
     elif model_type == "RF-CLA":
         if hp_combination:
             n_features, n_trees, min_samples_leaf, bootstrap, max_features, class_weight = hp_combination
             FeatureSelector = RFE(
-                estimator=DecisionTreeRegressor(random_state=random_state),
+                estimator=DecisionTreeRegressor(),
                 n_features_to_select=n_features,
                 verbose=0,
                 step=100,
@@ -49,17 +47,16 @@ def create_model(model_type, hp_combination=None, random_state=42):
                 bootstrap=bootstrap,
                 min_samples_leaf=min_samples_leaf,
                 max_features=max_features,
-                class_weight=class_weight,
-                random_state=random_state
+                class_weight=class_weight
             )
         else:
-            FeatureSelector = RFE(estimator=DecisionTreeRegressor(random_state=random_state))
-            RF = RandomForestClassifier(random_state=random_state)
+            FeatureSelector = RFE(estimator=DecisionTreeRegressor())
+            RF = RandomForestClassifier()
         pipeline = Pipeline(steps=[("Feature Selector", FeatureSelector), ("Model", RF)])
 
     elif model_type == "XGB-REG":
         if XGBRegressor is None:
-            raise ImportError("xgboost não instalado.")
+            raise ImportError("xgboost não está instalado.")
         if hp_combination:
             n_estimators, max_depth, learning_rate, subsample, colsample_bytree = hp_combination
             XGB = XGBRegressor(
