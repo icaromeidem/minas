@@ -59,6 +59,33 @@ from minas.models import create_model
 model = create_model('RF-REG')
 ```
 
+### Examples
+
+The `examples/` folder contains complete Jupyter notebooks demonstrating the full ML workflow:
+
+- **`data/`**: Data preparation and catalog creation
+  - `data_creation.ipynb`: Creating training datasets from spectroscopic surveys
+  - `apply/data/data_prepare.ipynb`: Preprocessing data for model application
+
+- **`tuning/`**: Hyperparameter optimization and feature selection
+  - `tuning_RF.ipynb` / `tuning_XGB.ipynb`: Grid search for optimal hyperparameters
+  - `feature_import_RF.ipynb` / `feature_import_XGB.ipynb`: Permutation importance analysis
+  - `pipeline/`: Custom pipeline configurations
+
+- **`training/`**: Model training and evaluation
+  - `predict_RF_all.ipynb` / `predict_XGB_all.ipynb`: Training models for Teff, log g, and [Fe/H]
+  - `graphs_XGB_all.ipynb`: Visualization of results and performance metrics
+  - `models/`: Saved trained models (XGB, RF)
+  - `predicts/`: Prediction metrics and validation results
+  - `graphs_results/`: Performance plots per parameter
+  - `graphs_matrix/`: Confusion matrices and correlation plots
+
+- **`apply/`**: Applying trained models to new data
+  - `apply_models_XGB.ipynb` / `apply_models_RF.ipynb`: Model application with Monte Carlo error propagation
+  - `pred_results/`: Final predictions with uncertainties
+
+These notebooks provide a complete template for stellar parameter estimation from photometric data.
+
 ### Bolometric Correction
 
 MINAS includes pre-trained models for calculating bolometric correction (BC) based on the corrections presented by Jordi et al. (2010), which provides BC data for Gaia-observed stars based on Teff, log g, and [Fe/H].
@@ -174,6 +201,33 @@ Exemplo de uso:
 from minas.models import create_model
 model = create_model('RF')
 ```
+
+### Exemplos
+
+A pasta `examples/` contém notebooks Jupyter completos demonstrando todo o fluxo de trabalho de ML:
+
+- **`data/`**: Preparação de dados e criação de catálogos
+  - `data_creation.ipynb`: Criação de datasets de treinamento a partir de levantamentos espectroscópicos
+  - `apply/data/data_prepare.ipynb`: Pré-processamento de dados para aplicação de modelos
+
+- **`tuning/`**: Otimização de hiperparâmetros e seleção de features
+  - `tuning_RF.ipynb` / `tuning_XGB.ipynb`: Busca em grade para hiperparâmetros ótimos
+  - `feature_import_RF.ipynb` / `feature_import_XGB.ipynb`: Análise de permutation importance
+  - `pipeline/`: Configurações personalizadas de pipeline
+
+- **`training/`**: Treinamento e avaliação de modelos
+  - `predict_RF_all.ipynb` / `predict_XGB_all.ipynb`: Treinamento de modelos para Teff, log g e [Fe/H]
+  - `graphs_XGB_all.ipynb`: Visualização de resultados e métricas de desempenho
+  - `models/`: Modelos treinados salvos (XGB, RF)
+  - `predicts/`: Métricas de predição e resultados de validação
+  - `graphs_results/`: Gráficos de desempenho por parâmetro
+  - `graphs_matrix/`: Matrizes de confusão e gráficos de correlação
+
+- **`apply/`**: Aplicação de modelos treinados em novos dados
+  - `apply_models_XGB.ipynb` / `apply_models_RF.ipynb`: Aplicação de modelos com propagação de erros via Monte Carlo
+  - `pred_results/`: Predições finais com incertezas
+
+Esses notebooks fornecem um template completo para estimativa de parâmetros estelares a partir de dados fotométricos.
 
 ### Correção Bolométrica
 
