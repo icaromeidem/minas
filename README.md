@@ -10,6 +10,8 @@
 
 MINAS was developed to assist and facilitate the complete Machine Learning workflow for astronomical photometric surveys. The package integrates all stages of the process, from preprocessing to final model application.
 
+> **Fun fact:** MINAS is also the name of a Brazilian state (Minas Gerais), the home state of Icaro Meidem, the package creator. As a proud "mineiro" (someone from Minas Gerais), the name represents both the astronomical focus and personal heritage.
+
 ### Main Features
 - **Complete workflow**: Integrates preprocessing, feature selection, hyperparameter tuning, and model application in a single package.
 - **Random Forest and XGBoost integrated**: Optimized pipelines for classification and regression with the main ML libraries, easily extensible to other algorithms.
@@ -152,6 +154,8 @@ This package is distributed under the MIT license. For questions, open an issue 
 ## Português
 
 MINAS foi desenvolvido para auxiliar e facilitar o fluxo de trabalho completo de análises de Machine Learning em levantamentos fotométricos astronômicos. O pacote integra todas as etapas do processo, desde o pré-processamento até a aplicação final dos modelos.
+
+> **Curiosidade:** MINAS também é o nome de um estado brasileiro (Minas Gerais), terra natal de Icaro Meidem, criador do pacote. Como um orgulhoso mineiro, o nome representa tanto o foco astronômico quanto a herança pessoal.
 
 ### Principais Características
 - **Fluxo de trabalho completo**: Integra pré-processamento, seleção de features, busca de hiperparâmetros e aplicação de modelos em um único pacote.
