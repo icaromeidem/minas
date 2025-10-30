@@ -1,3 +1,4 @@
+MANIFEST.in
 README.md
 pyproject.toml
 setup.cfg
@@ -9,6 +10,12 @@ src/minas.egg-info/requires.txt
 src/minas.egg-info/top_level.txt
 src/minas/bolometric/__init__.py
 src/minas/bolometric/magbol.py
+src/minas/bolometric/graphs/BC_pred_RF.png
+src/minas/bolometric/graphs/BC_pred_XGB.png
+src/minas/bolometric/models_bc/model_bc_RF.sav
+src/minas/bolometric/models_bc/model_bc_XGB.json
+src/minas/bolometric/table_RF/20251022185150_bc_0.9970_pred_RF.csv
+src/minas/bolometric/table_XG/20251022184648_bc_0.9983_pred_XG.csv
 src/minas/evaluation/__init__.py
 src/minas/evaluation/_graphics.py
 src/minas/evaluation/_metrics.py
