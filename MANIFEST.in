@@ -1,0 +1,7 @@
+# Include package data files
+recursive-include src/minas/bolometric/models_bc *.json *.sav
+recursive-include src/minas/bolometric/table_XG *.csv
+recursive-include src/minas/bolometric/table_RF *.csv
+recursive-include src/minas/bolometric/graphs *.png
+include README.md
+include LICENSE
