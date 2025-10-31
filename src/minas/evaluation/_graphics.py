@@ -104,7 +104,6 @@ def plot_regression_matrix(results_dict, bins_dict, param_order=None, titles=Non
         titles: list of column titles (e.g., ['Restricted', 'Less Restricted'])
         metrics_json_paths: dict with paths to metrics (optional)
     """
-    _set_times_font()
     
     if param_order is None:
         param_order = ['teff', 'logg', 'feh']
@@ -125,7 +124,7 @@ def plot_regression_matrix(results_dict, bins_dict, param_order=None, titles=Non
             
             if j == 0:
                 ax_res = fig.add_subplot(inner_gs[0])
-                ax_main = fig.add_subplot(inner_gs[1], sharex=ax_res)
+                ax_main = fig.add_subplot(inner_gs[1])  # Removido sharex para manter ticks visíveis
                 first_col_axes[i] = {'res': ax_res, 'main': ax_main}
             else:
                 ax_res = fig.add_subplot(inner_gs[0], sharex=first_col_axes[i]['res'], 
@@ -149,12 +148,20 @@ def plot_regression_matrix(results_dict, bins_dict, param_order=None, titles=Non
                                                    metrics_json_path=metrics_path, training_id=training_id, 
                                                    survey_name=survey_name)
             
+            # Sincronizar limites do eixo x entre painel de resíduos e principal
+            xlim = ax_main.get_xlim()
+            ax_res.set_xlim(xlim)
+            
+            # Garantir que os números do eixo x apareçam no painel principal
+            plt.setp(ax_main.get_xticklabels(), visible=True)
+            
             if j == 1:
                 ax_res.set_ylabel('')
                 ax_main.set_ylabel('')
                 plt.setp(ax_res.get_yticklabels(), visible=False)
                 plt.setp(ax_main.get_yticklabels(), visible=False)
             
+            # Remover label do eixo x mas manter os números (ticks)
             ax_main.set_xlabel('')
             
             if i == 0:
@@ -162,7 +169,7 @@ def plot_regression_matrix(results_dict, bins_dict, param_order=None, titles=Non
                             fontsize=12, fontweight='bold', ha='center', va='bottom')
     
     # Labels centralizados para cada linha
-    param_positions = {'teff': 0.670, 'logg': 0.360, 'feh': 0.055}
+    param_positions = {'teff': 0.656, 'logg': 0.349, 'feh': 0.035}
     for param in param_order:
         pinfo = PARAM_MAP.get(param, PARAM_MAP['teff'])
         xlabel = _get_xlabel(pinfo, survey_name)
