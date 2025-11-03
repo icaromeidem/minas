@@ -124,7 +124,7 @@ def plot_regression_matrix(results_dict, bins_dict, param_order=None, titles=Non
             
             if j == 0:
                 ax_res = fig.add_subplot(inner_gs[0])
-                ax_main = fig.add_subplot(inner_gs[1])  # Removido sharex para manter ticks visíveis
+                ax_main = fig.add_subplot(inner_gs[1])  
                 first_col_axes[i] = {'res': ax_res, 'main': ax_main}
             else:
                 ax_res = fig.add_subplot(inner_gs[0], sharex=first_col_axes[i]['res'], 
@@ -451,7 +451,7 @@ def plot_regression_with_residuals(y_true, y_pred, bins=None, param_name=None, p
     gs = fig.add_gridspec(2, 1, height_ratios=[0.5, 3.5], hspace=0.05)
     ax_main = fig.add_subplot(gs[1])
     ax_res = fig.add_subplot(gs[0], sharex=ax_main)
-    plt.setp(ax_res.get_xticklabels(), visible=False)
+    ax_res.tick_params(labelbottom=False)
     fig.subplots_adjust(left=0.08, right=0.96, top=0.98, bottom=0.08, hspace=0.05)
     
     custom_cmap = _create_custom_cmap(cmap)
@@ -464,7 +464,7 @@ def plot_regression_with_residuals(y_true, y_pred, bins=None, param_name=None, p
     ax_res.axhline(3*sigma, color='k', linestyle='--', linewidth=1)
     ax_res.axhline(-3*sigma, color='k', linestyle='--', linewidth=1)
     ax_res.set_ylabel("Residuals", fontsize=8)
-    ax_res.set_xticks([])
+    ax_res.tick_params(axis='x', which='both', bottom=False, top=False)
     
     # Painel principal
     ax_main.scatter(y_true, y_pred, c=c, cmap=custom_cmap, s=point_size, alpha=0.7)
@@ -535,7 +535,7 @@ def plot_bolometric_correction(y_true, y_pred, point_size=8, metrics_json_path=N
     gs = fig.add_gridspec(2, 1, height_ratios=[0.5, 3.5], hspace=0.05)
     ax_main = fig.add_subplot(gs[1])
     ax_res = fig.add_subplot(gs[0], sharex=ax_main)
-    plt.setp(ax_res.get_xticklabels(), visible=False)
+    ax_res.tick_params(labelbottom=False)
     fig.subplots_adjust(left=0.12, right=0.96, top=0.98, bottom=0.08, hspace=0.05)
     
     # Definir cor baseada no tipo de modelo
@@ -547,7 +547,7 @@ def plot_bolometric_correction(y_true, y_pred, point_size=8, metrics_json_path=N
     ax_res.axhline(-3*sigma, color='k', linestyle='--', linewidth=1)
     ax_res.set_ylabel("Residuals", fontsize=8)
     ax_res.tick_params(axis='y', labelsize=8)
-    ax_res.set_xticks([])
+    ax_res.tick_params(axis='x', which='both', bottom=False, top=False)
     
     # Painel principal - cor roxa
     ax_main.scatter(y_true, y_pred, c=color, s=point_size, alpha=0.7)
@@ -569,7 +569,7 @@ def plot_bolometric_correction(y_true, y_pred, point_size=8, metrics_json_path=N
     if metrics_str is not None:
         ax_main.legend([metrics_str], loc="upper left", fontsize=9, frameon=True)  # Legenda: 9
     else:
-        metrics_text = f"R² = {r2:.4f} | MAD = {mad:.3f}"
+        metrics_text = f"R² = {r2:.4f} | MAD = {mad:.3f} mag"
         ax_main.legend([metrics_text], loc="upper left", fontsize=9, frameon=True)  # Legenda: 9
 
     return fig
