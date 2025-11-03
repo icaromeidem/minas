@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 """
-Script para gerenciar versionamento semântico do MINAS.
+Script to manage MINAS semantic versioning.
 
-Versionamento Semântico (MAJOR.MINOR.PATCH):
-- MAJOR (1.x.x): Mudanças significativas/breaking changes
-- MINOR (x.1.x): Novas funcionalidades (backward compatible)
-- PATCH (x.x.1): Correções de bugs/mudanças pequenas
+Semantic Versioning (MAJOR.MINOR.PATCH):
+- MAJOR (1.x.x): Significant changes/breaking changes
+- MINOR (x.1.x): New features (backward compatible)
+- PATCH (x.x.1): Bug fixes/small changes
 
-Uso:
+Usage:
     python bump_version.py major   # 1.0.0 -> 2.0.0
     python bump_version.py minor   # 1.0.0 -> 1.1.0
     python bump_version.py patch   # 1.0.0 -> 1.0.1
@@ -18,21 +18,21 @@ import re
 from pathlib import Path
 
 def read_version():
-    """Lê a versão atual do arquivo VERSION."""
+    """Read current version from VERSION file."""
     version_file = Path(__file__).parent / "VERSION"
     return version_file.read_text().strip()
 
 def write_version(version):
-    """Escreve a nova versão no arquivo VERSION."""
+    """Write new version to VERSION file."""
     version_file = Path(__file__).parent / "VERSION"
     version_file.write_text(version + "\n")
 
 def update_pyproject_toml(version):
-    """Atualiza a versão no pyproject.toml."""
-    pyproject_file = Path(__file__).parent / "pyproject.toml"
+    """Update version in pyproject.toml."""
+    pyproject_file = Path(__file__).parent.parent / "pyproject.toml"
     content = pyproject_file.read_text()
     
-    # Substituir a linha de versão
+    # Replace version line
     new_content = re.sub(
         r'version = "[^"]+"',
         f'version = "{version}"',
@@ -43,10 +43,10 @@ def update_pyproject_toml(version):
 
 def bump_version(bump_type):
     """
-    Incrementa a versão baseado no tipo de mudança.
+    Increment version based on change type.
     
     Args:
-        bump_type: 'major', 'minor', ou 'patch'
+        bump_type: 'major', 'minor', or 'patch'
     """
     current = read_version()
     major, minor, patch = map(int, current.split('.'))
@@ -61,19 +61,19 @@ def bump_version(bump_type):
     elif bump_type == 'patch':
         patch += 1
     else:
-        print(f"Tipo inválido: {bump_type}")
-        print("Use: major, minor, ou patch")
+        print(f"Invalid type: {bump_type}")
+        print("Use: major, minor, or patch")
         sys.exit(1)
     
     new_version = f"{major}.{minor}.{patch}"
     
-    # Atualizar arquivos
+    # Update files
     write_version(new_version)
     update_pyproject_toml(new_version)
     
-    print(f"✓ Versão atualizada: {current} -> {new_version}")
-    print(f"\nPróximos passos:")
-    print(f"  1. git add VERSION pyproject.toml")
+    print(f"✓ Version updated: {current} -> {new_version}")
+    print(f"\nNext steps:")
+    print(f"  1. git add version/VERSION pyproject.toml")
     print(f"  2. git commit -m 'Bump version to {new_version}'")
     print(f"  3. git tag v{new_version}")
     print(f"  4. git push && git push --tags")
