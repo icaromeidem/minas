@@ -1,6 +1,6 @@
 #
 <p align="center">
-  <img src="logo/white.png" alt="MINAS logo" width="400"/>
+  <img src="logo/logo_black.png" alt="MINAS logo" width="500"/>
 </p>
 
 # MINAS - Machine-learning INtegrated analysis with photometric Astronomical Surveys
