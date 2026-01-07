@@ -13,21 +13,35 @@ except ImportError:
 
 
 def create_model(model_type, hp_combination = None):
-    if model_type == "RF-REG":
-        if hp_combination:
-            n_features, n_trees, min_samples_leaf, bootstrap, max_features = hp_combination
-            FeatureSelector = RFE(
-                estimator=DecisionTreeRegressor(),
-                n_features_to_select=n_features,
-                verbose=0,
-                step=100,
-            )
-            RF = RandomForestRegressor(
-                n_estimators=n_trees,
-                bootstrap=bootstrap,
-                min_samples_leaf=min_samples_leaf,
-                max_features=max_features,
-            )
+    if model_type == 'XGB-REG':
+        if isinstance(hp_combination, dict):
+            params = hp_combination.copy()
+        else:
+            raise ValueError("Para XGB-REG, forneça um dicionário de hiperparâmetros.")
+
+        required = [
+            'n_estimators',
+            'max_depth',
+            'learning_rate',
+            'subsample',
+            'colsample_bytree',
+            'gamma',
+            'random_state'
+        ]
+        for k in required:
+            if k not in params:
+                raise ValueError(f"Hiperparâmetro obrigatório ausente para XGB-REG: {k}")
+
+        model = XGBRegressor(
+            n_estimators=params['n_estimators'],
+            max_depth=params['max_depth'],
+            learning_rate=params['learning_rate'],
+            subsample=params['subsample'],
+            colsample_bytree=params['colsample_bytree'],
+            gamma=params['gamma'],
+            random_state=params['random_state']
+        )
+        return model
         else:
             FeatureSelector = RFE(estimator=DecisionTreeRegressor())
             RF = RandomForestRegressor()
