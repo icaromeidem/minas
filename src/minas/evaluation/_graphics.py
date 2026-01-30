@@ -92,19 +92,22 @@ def _get_xlabel(pinfo, survey_name):
 # ==================== Funções Principais ====================
 
 # Matrix of regression plots
-def plot_regression_matrix(results_dict, bins_dict, param_order=None, titles=None, point_size=3, 
-                          metrics_json_paths=None, training_id=None, survey_name=None):
+def plot_regression_matrix(
+    results_dict, bins_dict, param_order=None, titles=None, point_size=3, 
+    metrics_json_paths=None, training_id=None, survey_name=None, color_mode="cmap"
+):
     """
     Generates a 3x2 matrix of regression plots for teff, logg, and feh.
-    
+
     Args:
         results_dict: dict with keys ('teff_Restricted', 'teff_Less Restricted', ...), values: (y_true, y_pred)
         bins_dict: dict with keys 'teff', 'logg', 'feh', values: bins
         param_order: order of parameters (default: ['teff', 'logg', 'feh'])
         titles: list of column titles (e.g., ['Restricted', 'Less Restricted'])
         metrics_json_paths: dict with paths to metrics (optional)
+        color_mode: "cmap" (default, colorido) ou "black" (preto e branco)
     """
-    
+
     if param_order is None:
         param_order = ['teff', 'logg', 'feh']
     if titles is None:
@@ -113,15 +116,15 @@ def plot_regression_matrix(results_dict, bins_dict, param_order=None, titles=Non
     fig = plt.figure(figsize=(12, 16))
     gs = gridspec.GridSpec(3, 2, figure=fig, hspace=0.12, wspace=0.02, 
                           left=0.06, right=0.91, top=0.95, bottom=0.06)
-    
+
     first_col_axes = {}
-    
+
     for i, param in enumerate(param_order):
         for j, restr in enumerate(['Restricted', 'Less Restricted']):
             key = f'{param}_{restr}'
             inner_gs = gridspec.GridSpecFromSubplotSpec(2, 1, subplot_spec=gs[i, j], 
                                                         height_ratios=[0.5, 3.5], hspace=0.05)
-            
+
             if j == 0:
                 ax_res = fig.add_subplot(inner_gs[0])
                 ax_main = fig.add_subplot(inner_gs[1])  
@@ -131,99 +134,108 @@ def plot_regression_matrix(results_dict, bins_dict, param_order=None, titles=Non
                                         sharey=first_col_axes[i]['res'])
                 ax_main = fig.add_subplot(inner_gs[1], sharex=first_col_axes[i]['main'], 
                                          sharey=first_col_axes[i]['main'])
-            
+
             plt.setp(ax_res.get_xticklabels(), visible=False)
-            
+
             if key not in results_dict or results_dict[key] is None:
                 ax_res.axis('off')
                 ax_main.axis('off')
                 continue
-                
+
             y_true, y_pred = results_dict[key]
             bins = bins_dict.get(param, None)
             metrics_path = metrics_json_paths.get(key, None) if metrics_json_paths else None
-            
-            _plot_regression_with_residuals_panels(ax_main, ax_res, y_true, y_pred, bins=bins, 
-                                                   param_name=param, point_size=point_size, 
-                                                   metrics_json_path=metrics_path, training_id=training_id, 
-                                                   survey_name=survey_name)
-            
+
+            _plot_regression_with_residuals_panels(
+                ax_main, ax_res, y_true, y_pred, bins=bins, 
+                param_name=param, point_size=point_size, 
+                metrics_json_path=metrics_path, training_id=training_id, 
+                survey_name=survey_name, color_mode=color_mode
+            )
+
             # Sincronizar limites do eixo x entre painel de resíduos e principal
             xlim = ax_main.get_xlim()
             ax_res.set_xlim(xlim)
-            
+
             # Garantir que os números do eixo x apareçam no painel principal
             plt.setp(ax_main.get_xticklabels(), visible=True)
-            
+
             if j == 1:
                 ax_res.set_ylabel('')
                 ax_main.set_ylabel('')
                 plt.setp(ax_res.get_yticklabels(), visible=False)
                 plt.setp(ax_main.get_yticklabels(), visible=False)
-            
+
             # Remover label do eixo x mas manter os números (ticks)
             ax_main.set_xlabel('')
-            
+
             if i == 0:
                 ax_res.text(0.5, 1.45, titles[j], transform=ax_res.transAxes, 
                             fontsize=12, fontweight='bold', ha='center', va='bottom')
-    
+
     # Labels centralizados para cada linha
     param_positions = {'teff': 0.656, 'logg': 0.349, 'feh': 0.035}
     for param in param_order:
         pinfo = PARAM_MAP.get(param, PARAM_MAP['teff'])
         xlabel = _get_xlabel(pinfo, survey_name)
         fig.text(0.485, param_positions.get(param, 0.5), xlabel, ha='center', va='top', fontsize=10)
-        
-    
-    # Colorbars - posição vertical individual para cada parâmetro
-    colorbar_positions = {'teff': 0.675, 'logg': 0.3678, 'feh': 0.06}
-    for idx, param in enumerate(param_order):
-        key_right = f'{param}_Less Restricted'
-        if key_right in results_dict and results_dict[key_right] is not None:
-            bins = bins_dict.get(param, None)
-            if bins is not None:
-                pinfo = PARAM_MAP.get(param, PARAM_MAP['teff'])
-                custom_cmap = _create_custom_cmap(pinfo['cmap'])
-                n_colors = getattr(custom_cmap, 'N', 256)
-                norm = mcolors.BoundaryNorm(bins, n_colors)
-                sm = cm.ScalarMappable(norm=norm, cmap=custom_cmap)
-                sm.set_array([])
-                
-                row_position = colorbar_positions.get(param, 0.68 - 0.315*idx)
-                cax = fig.add_axes([0.92, row_position, 0.011, 0.275])
-                cbar = fig.colorbar(sm, cax=cax, orientation='vertical')
-                cbar.ax.tick_params(labelsize=8)
-                
-                if len(bins) > 1:
-                    tick_locs = [(bins[k]+bins[k+1])/2 for k in range(len(bins)-1)]
-                    cbar.set_ticks(tick_locs)
-                    cbar.ax.set_yticklabels([f"[{bins[k]}, {bins[k+1]})" for k in range(len(bins)-1)], 
-                                            fontsize=8)
-    
+
+    # Colorbars - posição vertical individual para cada parâmetro (apenas se color_mode == "cmap")
+    if color_mode == "cmap":
+        colorbar_positions = {'teff': 0.675, 'logg': 0.3678, 'feh': 0.06}
+        for idx, param in enumerate(param_order):
+            key_right = f'{param}_Less Restricted'
+            if key_right in results_dict and results_dict[key_right] is not None:
+                bins = bins_dict.get(param, None)
+                if bins is not None:
+                    pinfo = PARAM_MAP.get(param, PARAM_MAP['teff'])
+                    custom_cmap = _create_custom_cmap(pinfo['cmap'])
+                    n_colors = getattr(custom_cmap, 'N', 256)
+                    norm = mcolors.BoundaryNorm(bins, n_colors)
+                    sm = cm.ScalarMappable(norm=norm, cmap=custom_cmap)
+                    sm.set_array([])
+
+                    row_position = colorbar_positions.get(param, 0.68 - 0.315*idx)
+                    cax = fig.add_axes([0.92, row_position, 0.011, 0.275])
+                    cbar = fig.colorbar(sm, cax=cax, orientation='vertical')
+                    cbar.ax.tick_params(labelsize=8)
+
+                    if len(bins) > 1:
+                        tick_locs = [(bins[k]+bins[k+1])/2 for k in range(len(bins)-1)]
+                        cbar.set_ticks(tick_locs)
+                        cbar.ax.set_yticklabels([f"[{bins[k]}, {bins[k+1]})" for k in range(len(bins)-1)], 
+                                                fontsize=8)
+
     return fig
 
 # Individual graphics functions
 
-def _plot_regression_with_residuals_panels(ax_main, ax_res, y_true, y_pred, bins=None, param_name=None, 
-                                          point_size=3, metrics_json_path=None, training_id=None, survey_name=None):
+def _plot_regression_with_residuals_panels(
+    ax_main, ax_res, y_true, y_pred, bins=None, param_name=None, 
+    point_size=3, metrics_json_path=None, training_id=None, survey_name=None, color_mode="cmap"
+):
     """Plota painéis de regressão e resíduos em eixos fornecidos."""
     param_key = _detect_param_key(param_name)
     pinfo = PARAM_MAP[param_key]
-    
+
     xlabel = _get_xlabel(pinfo, survey_name)
     ylabel = pinfo['ylabel']
-    
+
     y_true = np.array(y_true)
     y_pred = np.array(y_pred)
     r2, mad, sigma, residuals = _calculate_metrics(y_true, y_pred)
     metrics_str = _load_metrics_from_json(metrics_json_path, r2, mad, pinfo['unit'])
-    
-    custom_cmap = _create_custom_cmap(pinfo['cmap'])
-    c = np.digitize(y_true, bins) if bins is not None else y_true
-    
+
+    if color_mode == "gray":
+        c = "gray"
+        cmap = None
+    else:
+        custom_cmap = _create_custom_cmap(pinfo['cmap'])
+        c = np.digitize(y_true, bins) if bins is not None else y_true
+        cmap = custom_cmap
+
     # Painel de resíduos
-    ax_res.scatter(y_true, residuals, c=c, cmap=custom_cmap, s=point_size, alpha=0.7)
+    ax_res.scatter(y_true, residuals, c=c, cmap=cmap, s=point_size, alpha=0.7)
     ax_res.set_facecolor("#ffffff")
     ax_res.axhline(0, color='k', linestyle='--', linewidth=1)
     ax_res.axhline(3*sigma, color='k', linestyle='--', linewidth=1)
@@ -231,51 +243,29 @@ def _plot_regression_with_residuals_panels(ax_main, ax_res, y_true, y_pred, bins
     ax_res.set_ylabel("Residuals", fontsize=10)
     ax_res.tick_params(axis='y', labelsize=9)
     ax_res.set_xticks([])
-    
-    # Painel principal
-    ax_main.scatter(y_true, y_pred, c=c, cmap=custom_cmap, s=point_size, alpha=0.7)
+
+     # Painel principal
+    ax_main.scatter(y_true, y_pred, c=c, cmap=cmap, s=point_size, alpha=0.7)
     ax_main.set_facecolor('#ffffff')
     minv, maxv = min(y_true.min(), y_pred.min()), max(y_true.max(), y_pred.max())
     ax_main.plot([minv, maxv], [minv, maxv], 'k-', lw=1, zorder=2)
-    
+
     for coll in ax_main.collections:
         coll.set_zorder(1)
-        
+
     ax_main.set_xlabel(xlabel, fontsize=10)
     ax_main.set_ylabel(ylabel, fontsize=10)
     ax_main.tick_params(axis='both', labelsize=9)
-    
+
+    # Exibir métricas como texto
     if metrics_str is not None:
-        ax_main.legend([metrics_str], loc="upper left", fontsize=10, frameon=True)
+        ax_main.text(
+            0.01, 0.99, metrics_str, transform=ax_main.transAxes,
+            fontsize=10, va='top', ha='left', bbox=dict(facecolor='none', edgecolor='none', alpha=0.7)
+        )
     else:
         ax_main.text(0.05, 0.95, f"R² Score: {r2:.4f}", transform=ax_main.transAxes, fontsize=9, va='top')
         ax_main.text(0.95, 0.05, f"MAD: {mad:.2f} {pinfo['unit']}", transform=ax_main.transAxes, fontsize=9, ha='right', va='bottom')
-
-def _plot_regression_panel(ax, y_true, y_pred, bins=None, param_name=None, point_size=3, 
-                          metrics_json_path=None, training_id=None, survey_name=None):
-    """Função auxiliar para desenhar apenas o painel principal de regressão em um ax fornecido."""
-    param_key = _detect_param_key(param_name)
-    pinfo = PARAM_MAP[param_key]
-    
-    y_true = np.array(y_true)
-    y_pred = np.array(y_pred)
-    r2, mad, sigma, residuals = _calculate_metrics(y_true, y_pred)
-    metrics_str = _load_metrics_from_json(metrics_json_path, r2, mad, pinfo['unit'])
-    
-    custom_cmap = _create_custom_cmap(pinfo['cmap'])
-    c = np.digitize(y_true, bins) if bins is not None else y_true
-    ax.scatter(y_true, y_pred, c=c, cmap=custom_cmap, s=point_size, alpha=0.7)
-    
-    minv, maxv = min(y_true.min(), y_pred.min()), max(y_true.max(), y_pred.max())
-    ax.plot([minv, maxv], [minv, maxv], 'k-', lw=1, zorder=2)
-    ax.set_xlabel(f"{pinfo['name']} True ({pinfo['unit']})")
-    ax.set_ylabel(pinfo['ylabel'])
-    
-    if metrics_str is not None:
-        ax.legend([metrics_str], loc="upper left", fontsize=9, frameon=True)
-    else:
-        ax.text(0.05, 0.95, f"R² Score: {r2:.4f}", transform=ax.transAxes, fontsize=9, va='top')
-        ax.text(0.95, 0.05, f"MAD: {mad:.2f} {pinfo['unit']}", transform=ax.transAxes, fontsize=9, ha='right', va='bottom')
 
 def plot_feature_importance(df_feat, param, figsize=(8, 6), n_top_features=10):
     """
@@ -411,108 +401,9 @@ def plot_handles(ax, m, c):
     """Cria handle para legenda."""
     return ax.plot([], [], marker=m, color=c, ls="None")[0]
 
-def plot_regression_with_residuals(y_true, y_pred, bins=None, param_name=None, param_unit=None, cmap=None, 
-                                   point_size=3, metrics_json_path=None, training_id=None, survey_name=None):
-    """
-    Gera um gráfico padrão para avaliação de regressão com painel de resíduos.
-    
-    Args:
-        y_true: valores verdadeiros
-        y_pred: valores preditos
-        bins: bins para coloração
-        param_name: nome do parâmetro
-        param_unit: unidade do parâmetro
-        cmap: colormap
-        point_size: tamanho dos pontos
-        metrics_json_path: caminho para arquivo JSON com métricas
-        training_id: ID do treinamento (opcional)
-        survey_name: código do survey (A, L, G, W)
-    
-    Returns:
-        fig: figura matplotlib
-    """
-    param_key = _detect_param_key(param_name)
-    pinfo = PARAM_MAP[param_key]
-    
-    if param_unit is None:
-        param_unit = pinfo['unit']
-    if cmap is None:
-        cmap = pinfo['cmap']
-    
-    xlabel = _get_xlabel(pinfo, survey_name)
-    ylabel = pinfo['ylabel']
-    
-    y_true = np.array(y_true)
-    y_pred = np.array(y_pred)
-    r2, mad, sigma, residuals = _calculate_metrics(y_true, y_pred)
-    metrics_str = _load_metrics_from_json(metrics_json_path, r2, mad, pinfo['unit'])
-    
-    fig = plt.figure(figsize=(6, 6))
-    gs = fig.add_gridspec(2, 1, height_ratios=[0.5, 3.5], hspace=0.05)
-    ax_main = fig.add_subplot(gs[1])
-    ax_res = fig.add_subplot(gs[0], sharex=ax_main)
-    ax_res.tick_params(labelbottom=False)
-    fig.subplots_adjust(left=0.08, right=0.96, top=0.98, bottom=0.08, hspace=0.05)
-    
-    custom_cmap = _create_custom_cmap(cmap)
-    c = np.digitize(y_true, bins) if bins is not None else y_true
-    
-    # Painel de resíduos
-    ax_res.scatter(y_true, residuals, c=c, cmap=custom_cmap, s=point_size, alpha=0.7)
-    ax_res.set_facecolor("#ffffff")
-    ax_res.axhline(0, color='k', linestyle='--', linewidth=1)
-    ax_res.axhline(3*sigma, color='k', linestyle='--', linewidth=1)
-    ax_res.axhline(-3*sigma, color='k', linestyle='--', linewidth=1)
-    ax_res.set_ylabel("Residuals", fontsize=8)
-    ax_res.tick_params(axis='x', which='both', bottom=False, top=False)
-    
-    # Painel principal
-    ax_main.scatter(y_true, y_pred, c=c, cmap=custom_cmap, s=point_size, alpha=0.7)
-    ax_main.set_facecolor('#ffffff')
-    
-    if bins is not None:
-        n_colors = getattr(custom_cmap, 'N', 256)
-        norm = mcolors.BoundaryNorm(bins, n_colors)
-        sm = cm.ScalarMappable(norm=norm, cmap=custom_cmap)
-        sm.set_array([])
-        cax = fig.add_axes([0.98, 0.08, 0.013, 0.90])
-        cbar = fig.colorbar(sm, cax=cax, orientation='vertical', aspect=60)
-        
-        if len(bins) > 1:
-            tick_locs = [(bins[i]+bins[i+1])/2 for i in range(len(bins)-1)]
-            cbar.set_ticks(tick_locs)
-            cbar.ax.set_yticklabels([f"[{bins[i]}, {bins[i+1]})" for i in range(len(bins)-1)])
-    
-    minv, maxv = min(y_true.min(), y_pred.min()), max(y_true.max(), y_pred.max())
-    ax_main.plot([minv, maxv], [minv, maxv], 'k-', lw=1, zorder=2)
-    
-    for coll in ax_main.collections:
-        coll.set_zorder(1)
-        
-    ax_main.set_xlabel(xlabel)
-    ax_main.set_ylabel(ylabel)
-    
-    if metrics_str is not None:
-        ax_main.legend([metrics_str], loc="upper left", fontsize=9, frameon=True)
-    else:
-        ax_main.text(0.05, 0.95, f"R² Score: {r2:.4f}", transform=ax_main.transAxes, fontsize=9, va='top')
-        ax_main.text(0.95, 0.05, f"MAD: {mad:.2f} {pinfo['unit']}", transform=ax_main.transAxes, fontsize=9, ha='right', va='bottom')
-    
-    return fig
-
 def plot_bolometric_correction(y_true, y_pred, point_size=8, metrics_json_path=None, model_type='XGB'):
     """
     Gera gráfico de regressão para correção bolométrica com estilo específico.
-    
-    Args:
-        y_true: valores verdadeiros da correção bolométrica
-        y_pred: valores preditos da correção bolométrica
-        point_size: tamanho dos pontos (default: 8)
-        metrics_json_path: caminho para arquivo JSON com métricas (opcional)
-        model_type: tipo de modelo ('XGB' ou 'RF') para definir cor (default: 'XGB')
-    
-    Returns:
-        fig: figura matplotlib
     """
     _set_times_font()
     
@@ -529,6 +420,8 @@ def plot_bolometric_correction(y_true, y_pred, point_size=8, metrics_json_path=N
             metrics_str = f"R² = {metrics.get('r2', r2):.4f} | MAD = {metrics.get('mad', mad):.3f} mag"
         except:
             pass
+    else:
+        metrics_str = f"R² = {r2:.4f} | MAD = {mad:.3f} mag"
     
     # Criar figura com painel de resíduos
     fig = plt.figure(figsize=(6, 6))
@@ -549,7 +442,7 @@ def plot_bolometric_correction(y_true, y_pred, point_size=8, metrics_json_path=N
     ax_res.tick_params(axis='y', labelsize=8)
     ax_res.tick_params(axis='x', which='both', bottom=False, top=False)
     
-    # Painel principal - cor roxa
+    # Painel principal
     ax_main.scatter(y_true, y_pred, c=color, s=point_size, alpha=0.7)
     ax_main.set_facecolor('#ffffff')
     
@@ -557,23 +450,22 @@ def plot_bolometric_correction(y_true, y_pred, point_size=8, metrics_json_path=N
     minv, maxv = min(y_true.min(), y_pred.min()), max(y_true.max(), y_pred.max())
     ax_main.plot([minv, maxv], [minv, maxv], 'k-', lw=1, zorder=2)
     
-    # Configurar z-order
     for coll in ax_main.collections:
         coll.set_zorder(1)
     
-    ax_main.set_xlabel('BC Jordi et. al. (2010) (mag)', fontsize=10)  # Labels principais: 10
-    ax_main.set_ylabel('BC Predicted (mag)', fontsize=10)  # Labels principais: 10
+    ax_main.set_xlabel('BC Jordi et. al. (2010) (mag)', fontsize=10)
+    ax_main.set_ylabel('BC Predicted (mag)', fontsize=10)
     ax_main.tick_params(axis='both', labelsize=9)
     
-    # Adicionar métricas
-    if metrics_str is not None:
-        ax_main.legend([metrics_str], loc="upper left", fontsize=9, frameon=True)  # Legenda: 9
-    else:
-        metrics_text = f"R² = {r2:.4f} | MAD = {mad:.3f} mag"
-        ax_main.legend([metrics_text], loc="upper left", fontsize=9, frameon=True)  # Legenda: 9
-
+    # Exibir métricas como texto (sem legend/bolinha)
+    ax_main.text(
+        0.01, 0.99, metrics_str if metrics_str is not None else f"R² Score: {r2:.4f}",
+        transform=ax_main.transAxes, fontsize=10, va='top', ha='left',
+        bbox=dict(facecolor='none', edgecolor='none', alpha=0.7)
+    )
     return fig
 
+        
 def show(fig):
     """Exibe o gráfico gerado (figura matplotlib)."""
     plt.show(fig)

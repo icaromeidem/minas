@@ -28,6 +28,21 @@ _MODEL_DIR = Path(__file__).parent / 'models_bc'
 _VALIDATION_DIR = Path(__file__).parent.parent.parent.parent.parent / 'apply_models' / 'bolometric_correction'
 
 
+def _predict_xgb(model, X):
+    """
+    Safe prediction for XGBoost models loaded via load_model.
+
+    Ensures correct feature alignment and explicit feature names.
+    """
+    booster = model.get_booster()
+    features = booster.feature_names
+
+    X_aligned = X[features]
+    dmat = xgb.DMatrix(X_aligned, feature_names=features)
+
+    return booster.predict(dmat)
+
+
 def _load_model_stats(model_type):
     """
     Load model statistics from validation files.
@@ -232,9 +247,14 @@ def apply_bc(data, teff_col, logg_col, feh_col, model_type='XGB',
     
     # Load model and make prediction
     bc_calc = BolometricCorrection(model_type=model_type)
-    X_new = df[feature_cols]
-    bc_predictions = bc_calc.model.predict(X_new)
-    
+
+    if model_type == 'XGB':
+        bc_predictions = _predict_xgb(bc_calc.model, df)
+    else:
+        X_new = df[feature_cols]
+        bc_predictions = bc_calc.model.predict(X_new)
+
+
     # Add predictions and uncertainties
     df[output_col] = bc_predictions
     df['err_' + output_col] = uncertainty
