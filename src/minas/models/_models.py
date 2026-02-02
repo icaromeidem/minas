@@ -4,7 +4,7 @@ from sklearn.ensemble import RandomForestRegressor, RandomForestClassifier
 from sklearn.pipeline import Pipeline
 from sklearn.tree import DecisionTreeRegressor
 
-# Suporte a XGBoost
+# XGBoost support
 try:
     from xgboost import XGBRegressor, XGBClassifier
 except ImportError:
@@ -56,7 +56,7 @@ def create_model(model_type, hp_combination = None):
 
     elif model_type == "XGB-REG":
         if XGBRegressor is None:
-            raise ImportError("xgboost não está instalado.")
+            raise ImportError("xgboost is not installed.")
         if hp_combination:
             colsample_bytree, gamma, learning_rate, max_depth, n_estimators, subsample = hp_combination
             XGB = XGBRegressor(
@@ -74,7 +74,7 @@ def create_model(model_type, hp_combination = None):
 
     elif model_type == "XGB-CLA":
         if XGBClassifier is None:
-            raise ImportError("xgboost não está instalado.")
+            raise ImportError("xgboost is not installed.")
         if hp_combination:
             colsample_bytree, gamma, learning_rate, max_depth, n_estimators, subsample = hp_combination
             XGB = XGBClassifier(
@@ -91,6 +91,6 @@ def create_model(model_type, hp_combination = None):
         pipeline = Pipeline(steps=[("Model", XGB)])
 
     else:
-        raise ValueError("Modelo não suportado")
+        raise ValueError("Model not supported")
 
     return pipeline

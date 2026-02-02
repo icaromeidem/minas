@@ -4,8 +4,8 @@ def mad_score(y_true, y_pred):
 from sklearn.inspection import permutation_importance
 def get_permutation_importance_rf(X, y, n_features_to_save=10, params=None, random_state=42, n_estimators=100, scoring='r2'):
     """
-    Avalia a importância das features usando permutation importance com RandomForestRegressor.
-    Retorna as n_features_to_save mais importantes.
+    Evaluates feature importance using permutation importance with RandomForestRegressor.
+    Returns the n_features_to_save most important features.
     """
     if params is not None:
         rf = RandomForestRegressor(**params)
@@ -34,8 +34,8 @@ def get_permutation_importance_rf(X, y, n_features_to_save=10, params=None, rand
     return selected_features.tolist(), df_feat
 def get_permutation_importance_xgb(X, y, n_features_to_save=10, params=None, random_state=42, n_estimators=100, scoring='r2'):
     """
-    Avalia a importância das features usando permutation importance com XGBRegressor.
-    Retorna as n_features_to_save mais importantes.
+    Evaluates feature importance using permutation importance with XGBRegressor.
+    Returns the n_features_to_save most important features.
     """
     if params is not None:
         user_params = params.copy()
@@ -79,8 +79,8 @@ from xgboost import XGBRegressor
 
 def get_important_features(X, y, n_features_to_save=10, params=None, random_state=42, n_estimators=100):
     """
-    Avalia a importância das features usando RandomForestRegressor.
-    Retorna as n_features_to_save mais importantes.
+    Evaluates feature importance using RandomForestRegressor.
+    Returns the n_features_to_save most important features.
     """
     if params is not None:
         rf = RandomForestRegressor(**params)
@@ -89,13 +89,13 @@ def get_important_features(X, y, n_features_to_save=10, params=None, random_stat
     rf.fit(X, y)
     importances = rf.feature_importances_
     feature_names = np.array(X.columns)
-    # Ordenar por importância decrescente
+    # Sort by descending importance
     sorted_idx = np.argsort(importances)[::-1]
     sorted_importances = importances[sorted_idx]
     sorted_features = feature_names[sorted_idx]
-    # Selecionar as n_features_to_save mais importantes
+    # Select n_features_to_save most important features
     selected_features = sorted_features[:n_features_to_save]
-    # DataFrame para visualização
+    # DataFrame for visualization
     cumulative_importance = np.cumsum(sorted_importances)
     df_feat = pd.DataFrame({
         'feature': sorted_features,
@@ -107,10 +107,10 @@ def get_important_features(X, y, n_features_to_save=10, params=None, random_stat
 
 def get_important_features_xgb(X, y, n_features_to_save=10, params=None, random_state=42, n_estimators=100):
     """
-    Avalia a importância das features usando XGBRegressor.
-    Retorna as n_features_to_save mais importantes.
+    Evaluates feature importance using XGBRegressor.
+    Returns the n_features_to_save most important features.
     """
-    # Se params for fornecido, use as configurações do usuário, mas garanta defaults para random_state, n_estimators, n_jobs se não estiverem presentes
+    # If params is provided, use user settings, but ensure defaults for random_state, n_estimators, n_jobs if not present
     if params is not None:
         user_params = params.copy()
         if 'random_state' not in user_params:
@@ -127,13 +127,13 @@ def get_important_features_xgb(X, y, n_features_to_save=10, params=None, random_
     xgb.fit(X, y)
     importances = xgb.feature_importances_
     feature_names = np.array(X.columns)
-    # Ordenar por importância decrescente
+    # Sort by descending importance
     sorted_idx = np.argsort(importances)[::-1]
     sorted_importances = importances[sorted_idx]
     sorted_features = feature_names[sorted_idx]
-    # Selecionar as n_features_to_save mais importantes
+    # Select n_features_to_save most important features
     selected_features = sorted_features[:n_features_to_save]
-    # DataFrame para visualização
+    # DataFrame for visualization
     cumulative_importance = np.cumsum(sorted_importances)
     df_feat = pd.DataFrame({
         'feature': sorted_features,

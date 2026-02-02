@@ -104,7 +104,7 @@ Two Machine Learning algorithms were trained to predict bolometric correction:
 #### Performance Plots
 
 <p align="center">
-  <img src="src/minas/bolometric/graphs/BC_pred_XGB.png" alt="XGBoost Performance" width="49.26%"/>
+  <img src="src/minas/bolometric/graphs/BC_pred_XGB.png" alt="XGBoost Performance" width="49.245%"/>
   <img src="src/minas/bolometric/graphs/BC_pred_RF.png" alt="Random Forest Performance" width="49%"/>
 </p>
 
@@ -249,7 +249,7 @@ Dois algoritmos de Machine Learning foram treinados para prever a correção bol
 #### Gráficos de Desempenho
 
 <p align="center">
-  <img src="src/minas/bolometric/graphs/BC_pred_XGB.png" alt="XGBoost Performance" width="49.26%"/>
+  <img src="src/minas/bolometric/graphs/BC_pred_XGB.png" alt="XGBoost Performance" width="49.245%"/>
   <img src="src/minas/bolometric/graphs/BC_pred_RF.png" alt="Random Forest Performance" width="49%"/>
 </p>
 
