@@ -9,8 +9,6 @@
 [![Python](https://img.shields.io/pypi/pyversions/minas)](https://pypi.org/project/minas/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-## English
-
 MINAS was developed to assist and facilitate the complete Machine Learning workflow for astronomical photometric surveys. The package integrates all stages of the process, from preprocessing to final model application.
 
 > **Fun fact:** MINAS is also the name of a Brazilian state (Minas Gerais), the home state of Icaro Meidem, the package creator. As a proud "mineiro" (someone from Minas Gerais), the name represents both the astronomical focus and personal heritage.
