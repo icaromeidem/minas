@@ -154,7 +154,7 @@ This package is distributed under the MIT license. For questions, open an issue 
 If you use MINAS in your research, please cite the package and the grid(s) you used:
 
 ```bibtex
-@software{meidem,
+@software{minas,
   author  = {Meidem, Icaro},
   title   = {{MINAS}: Machine-learning INtegrated analysis with photometric Astronomical Surveys},
   year    = {2025},
