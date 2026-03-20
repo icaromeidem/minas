@@ -5,8 +5,8 @@
 
 # MINAS - Machine-learning INtegrated analysis with photometric Astronomical Surveys
 
-[![PyPI version](https://badge.fury.io/py/meidem.svg)](https://badge.fury.io/py/minas)
-[![Python](https://img.shields.io/pypi/pyversions/meidem)](https://pypi.org/project/minas/)
+[![PyPI version](https://badge.fury.io/py/minas.svg)](https://badge.fury.io/py/minas)
+[![Python](https://img.shields.io/pypi/pyversions/minas)](https://pypi.org/project/minas/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## English
