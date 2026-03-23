@@ -1,8 +1,8 @@
 def load_model_pipeline(model_type, path):
     """
-    Carrega um modelo treinado do tipo XGB (.json) ou RF (.sav) conforme o tipo informado.
-    model_type: 'XGB' ou 'RF'
-    path: caminho do arquivo do modelo
+    Loads a trained model of type XGB (.json) or RF (.sav) according to the specified type.
+    model_type: 'XGB' or 'RF'
+    path: model file path
     """
     if model_type == 'XGB':
         try:
@@ -16,7 +16,7 @@ def load_model_pipeline(model_type, path):
         import joblib
         return joblib.load(open(path, 'rb'))
     else:
-        raise ValueError('Tipo de modelo não suportado: use "XGB" ou "RF"')
+        raise ValueError('Model type not supported: use "XGB" or "RF"')
 import gc
 import numpy as np
 import pandas as pd
@@ -70,7 +70,7 @@ class Predictor:
             m2 = None
             std_dev = None
 
-            # Detecta se é pipeline (list, tuple, sklearn Pipeline) ou estimador direto
+            # Detect if it's a pipeline (list, tuple, sklearn Pipeline) or direct estimator
             if hasattr(pipeline, '__getitem__') and not isinstance(pipeline, str):
                 model_obj = pipeline[-1]
             else:
@@ -82,8 +82,8 @@ class Predictor:
             elif "Regressor" in str(type(model_obj)):
                 true_predictions = pipeline.predict(work_df)
 
-            # Processar MC em mini-batches para economizar memória
-            mc_batch_size = self.batch_partitions  # Definido pelo usuário na criação do Predictor
+            # Process MC in mini-batches to save memory
+            mc_batch_size = self.batch_partitions  # Defined by user when creating Predictor
             for batch_start in range(0, self.mc_reps, mc_batch_size):
                 batch_end = min(batch_start + mc_batch_size, self.mc_reps)
                 batch_size = batch_end - batch_start
@@ -110,7 +110,7 @@ class Predictor:
                         verbose=False,
                     )
 
-                    # Detecta se é pipeline (list, tuple, sklearn Pipeline) ou estimador direto
+                    # Detect if it's a pipeline (list, tuple, sklearn Pipeline) or direct estimator
                     if hasattr(pipeline, '__getitem__') and not isinstance(pipeline, str):
                         model_obj = pipeline[-1]
                     else:
@@ -121,17 +121,17 @@ class Predictor:
                     elif "Regressor" in str(type(model_obj)):
                         batch_predictions[i] = pipeline.predict(mc_work_df)
 
-                    # Limpar memória intermediária
+                    # Clear intermediate memory
                     del mc_work_df, norm_dist
 
-                # Calcular variância parcial (algoritmo de Welford online)
+                # Calculate partial variance (Welford's online algorithm)
                 if batch_start == 0:
                     n = batch_size
                     mean = batch_predictions.mean(axis=0)
                     m2 = ((batch_predictions - mean) ** 2).sum(axis=0)
                 else:
                     if n is None or mean is None or m2 is None:
-                        # fallback: se por algum motivo não inicializou, inicializa
+                        # fallback: if for some reason it didn't initialize, initialize now
                         n = batch_size
                         mean = batch_predictions.mean(axis=0)
                         m2 = ((batch_predictions - mean) ** 2).sum(axis=0)
@@ -139,7 +139,7 @@ class Predictor:
                         batch_mean = batch_predictions.mean(axis=0)
                         batch_var = batch_predictions.var(axis=0, ddof=0)
 
-                        # Combinar estatísticas (algoritmo de Chan)
+                        # Combine statistics (Chan's algorithm)
                         new_n = n + batch_size
                         delta = batch_mean - mean
                         mean = (n * mean + batch_size * batch_mean) / new_n
@@ -150,7 +150,7 @@ class Predictor:
                 del batch_predictions
                 gc.collect()
 
-            # Calcular desvio padrão final
+            # Calculate final standard deviation
             if n is not None and mean is not None and m2 is not None and n > 1:
                 std_dev = np.sqrt(m2 / (n - 1))
             elif mean is not None:
@@ -174,7 +174,7 @@ class Predictor:
 
         final_df.to_csv(output_path, mode=save_mode, header=header)
 
-        # Limpar memória
+        # clean the memory
         del final_df, work_df, input_data
         gc.collect()
 

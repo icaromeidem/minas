@@ -82,18 +82,18 @@ def assemble_work_df(
     """
     
     if verbose:
-        print("Iniciando processo de criação do dataframe de trabalho:\n")
+        print("Starting work dataframe creation process:\n")
 
     # If a dictionary of corrections is passed, apply the corrections to the magnitudes
     if correction_pairs:
         if verbose:
-            print("  - Aplicando correção de magnitudes...", end="")
+            print("  - Applying magnitude corrections...", end="")
 
         start_time = time.time()
         df = correct_magnitudes(df, correction_pairs)
         
         if verbose:
-            print(f" Tempo: {(time.time() - start_time):.2f} s")
+            print(f" Time: {(time.time() - start_time):.2f} s")
 
     # Filter the df to get only the filters passed
     work_df = df[filters].copy()
@@ -101,29 +101,29 @@ def assemble_work_df(
     # If asked for, create a dataframe with all the possible colors and add it to the work dataframe
     if add_colors is True:
         if verbose:
-            print("  - Adicionando cores ao dataframe...", end="")
+            print("  - Adding colors to dataframe...", end="")
 
         start_time = time.time()
         colors_df = create_colors(work_df, filters)
         work_df = pd.concat([work_df, colors_df], axis=1)
         
         if verbose:
-            print(f" Tempo: {(time.time() - start_time):.2f} s")
+            print(f" Time: {(time.time() - start_time):.2f} s")
 
     # If asked for, create a dataframe with all the possible color combinations and add it to the work dataframe
     if add_combinations is True:
         if verbose:
-            print("  - Adicionando combinações de cores ao dataframe...", end="")
+            print("  - Adding color combinations to dataframe...", end="")
 
         start_time = time.time()
         combinations_df = create_combinations(work_df, filters)
         work_df = pd.concat([work_df, combinations_df], axis=1)
         
         if verbose:
-            print(f" Tempo: {(time.time() - start_time):.2f} s")
+            print(f" Time: {(time.time() - start_time):.2f} s")
 
     if verbose:
-        print(f"\nProcesso finalizado! Shape da Tabela Gerada: {work_df.shape}")
+        print(f"\nProcess completed! Generated Table Shape: {work_df.shape}")
 
     # Return the resulting dataframe
     return work_df

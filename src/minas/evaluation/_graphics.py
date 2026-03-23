@@ -1,9 +1,9 @@
 """
 Graphics module for MINAS
-Funções para visualização de resultados de modelos de regressão
+Functions for visualization of regression model results
 """
 
-# ==================== Imports e Configurações Globais ====================
+# ==================== Imports and Global Configurations ====================
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import matplotlib.colors as mcolors
@@ -18,29 +18,29 @@ import os
 import json
 from math import log10, floor
 
-# Configurações de fonte
+# Font configurations
 label_fontdict = {"family": "sans-serif", "weight": "normal", "size": 10}
 legend_label_fontdict = {"family": "sans-serif", "weight": "normal", "size": 10}
 legend_title_fontdict = {"family": "sans-serif", "weight": "bold", "size": 10}
 tick_size = 10
 
-# Mapeamento de parâmetros (centralizado para evitar redundância)
+# Parameter mapping
 PARAM_MAP = {
-    'teff': {'name': 'Teff', 'unit': 'K', 'cmap': 'Reds', 'ylabel': 'Teff Predicted (K)'},
-    'logg': {'name': 'logg', 'unit': 'dex', 'cmap': 'Greens', 'ylabel': 'logg Predicted (dex)'},
-    'feh': {'name': '[Fe/H]', 'unit': 'dex', 'cmap': 'Blues', 'ylabel': '[Fe/H] Predicted (dex)'}
+    'teff': {'name': 'Teff', 'unit': 'K', 'cmap': 'Reds', 'color': "#EB2020", 'ylabel': 'Teff Predicted (K)'},
+    'logg': {'name': 'logg', 'unit': 'dex', 'cmap': 'Greens', 'color': '#228B22', 'ylabel': 'logg Predicted (dex)'},
+    'feh': {'name': '[Fe/H]', 'unit': 'dex', 'cmap': 'Blues', 'color': '#1E90FF', 'ylabel': '[Fe/H] Predicted (dex)'}
 }
 
 SURVEY_MAP = {'A': 'APOGEE', 'L': 'LAMOST', 'G': 'GALAH', 'W': 'WISE'}
 
-# ==================== Funções Auxiliares ====================
+# ==================== Auxiliary Functions ====================
 def _set_times_font():
-    """Configura fonte Times para os gráficos (sem definir tamanho global)."""
+    """Configures Times font for plots (without setting global size)."""
     plt.rcParams['font.family'] = 'serif'
     plt.rcParams['font.serif'] = ['Times', 'DejaVu Serif', 'Liberation Serif']
 
 def _detect_param_key(param_name):
-    """Detecta a chave do parâmetro a partir do nome."""
+    """Detects parameter key from name."""
     if param_name is None:
         return 'teff'
     pname = param_name.strip().lower().replace('[', '').replace(']', '').replace('/', '').replace(' ', '')
@@ -53,14 +53,14 @@ def _detect_param_key(param_name):
     return 'teff'
 
 def _create_custom_cmap(cmap_name):
-    """Cria colormap customizado com cinza inicial."""
+    """Creates custom colormap with initial gray."""
     base_cmap = cm.get_cmap(cmap_name)
     gray_rgb = mcolors.to_rgb('#cccccc')
     new_colors = [gray_rgb] + [base_cmap(i) for i in np.linspace(0.15, 1, 255)]
     return LinearSegmentedColormap.from_list(f"gray_{cmap_name}", new_colors)
 
 def _calculate_metrics(y_true, y_pred):
-    """Calcula métricas de regressão."""
+    """Calculates regression metrics."""
     residuals = y_pred - y_true
     sigma = np.std(residuals)
     mad = np.median(np.abs(residuals))
@@ -72,7 +72,7 @@ def _calculate_metrics(y_true, y_pred):
     return r2, mad, sigma, residuals
 
 def _load_metrics_from_json(metrics_json_path, r2, mad, param_unit):
-    """Carrega métricas de arquivo JSON se disponível."""
+    """Loads metrics from JSON file if available."""
     if metrics_json_path is not None and os.path.exists(metrics_json_path):
         try:
             with open(metrics_json_path, 'r') as f:
@@ -83,13 +83,13 @@ def _load_metrics_from_json(metrics_json_path, r2, mad, param_unit):
     return None
 
 def _get_xlabel(pinfo, survey_name):
-    """Gera o label do eixo X com nome do survey se fornecido."""
+    """Generates X-axis label with survey name if provided."""
     survey_label = SURVEY_MAP.get(survey_name, survey_name) if survey_name else None
     if survey_label:
         return f"{pinfo['name']} {survey_label} ({pinfo['unit']})"
     return f"{pinfo['name']} True ({pinfo['unit']})"
 
-# ==================== Funções Principais ====================
+# ==================== Main Functions ====================
 
 # Matrix of regression plots
 def plot_regression_matrix(
@@ -105,7 +105,7 @@ def plot_regression_matrix(
         param_order: order of parameters (default: ['teff', 'logg', 'feh'])
         titles: list of column titles (e.g., ['Restricted', 'Less Restricted'])
         metrics_json_paths: dict with paths to metrics (optional)
-        color_mode: "cmap" (default, colorido) ou "black" (preto e branco)
+        color_mode: "cmap" (default, colormap) or "color" (specific solid color per parameter)
     """
 
     if param_order is None:
@@ -153,11 +153,11 @@ def plot_regression_matrix(
                 survey_name=survey_name, color_mode=color_mode
             )
 
-            # Sincronizar limites do eixo x entre painel de resíduos e principal
+            # Synchronize x-axis limits between residuals and main panels
             xlim = ax_main.get_xlim()
             ax_res.set_xlim(xlim)
 
-            # Garantir que os números do eixo x apareçam no painel principal
+            # Ensure x-axis numbers appear on main panel
             plt.setp(ax_main.get_xticklabels(), visible=True)
 
             if j == 1:
@@ -166,21 +166,21 @@ def plot_regression_matrix(
                 plt.setp(ax_res.get_yticklabels(), visible=False)
                 plt.setp(ax_main.get_yticklabels(), visible=False)
 
-            # Remover label do eixo x mas manter os números (ticks)
+            # Remove x-axis label but keep tick numbers
             ax_main.set_xlabel('')
 
             if i == 0:
                 ax_res.text(0.5, 1.45, titles[j], transform=ax_res.transAxes, 
                             fontsize=12, fontweight='bold', ha='center', va='bottom')
 
-    # Labels centralizados para cada linha
+    # Centered labels for each row
     param_positions = {'teff': 0.656, 'logg': 0.349, 'feh': 0.035}
     for param in param_order:
         pinfo = PARAM_MAP.get(param, PARAM_MAP['teff'])
         xlabel = _get_xlabel(pinfo, survey_name)
         fig.text(0.485, param_positions.get(param, 0.5), xlabel, ha='center', va='top', fontsize=10)
 
-    # Colorbars - posição vertical individual para cada parâmetro (apenas se color_mode == "cmap")
+    # Colorbars - individual vertical position for each parameter (only if color_mode == "cmap")
     if color_mode == "cmap":
         colorbar_positions = {'teff': 0.675, 'logg': 0.3678, 'feh': 0.06}
         for idx, param in enumerate(param_order):
@@ -214,7 +214,7 @@ def _plot_regression_with_residuals_panels(
     ax_main, ax_res, y_true, y_pred, bins=None, param_name=None, 
     point_size=3, metrics_json_path=None, training_id=None, survey_name=None, color_mode="cmap"
 ):
-    """Plota painéis de regressão e resíduos em eixos fornecidos."""
+    """Plots regression and residual panels on provided axes."""
     param_key = _detect_param_key(param_name)
     pinfo = PARAM_MAP[param_key]
 
@@ -226,15 +226,15 @@ def _plot_regression_with_residuals_panels(
     r2, mad, sigma, residuals = _calculate_metrics(y_true, y_pred)
     metrics_str = _load_metrics_from_json(metrics_json_path, r2, mad, pinfo['unit'])
 
-    if color_mode == "gray":
-        c = "gray"
+    if color_mode == "color":
+        c = pinfo['color']
         cmap = None
     else:
         custom_cmap = _create_custom_cmap(pinfo['cmap'])
         c = np.digitize(y_true, bins) if bins is not None else y_true
         cmap = custom_cmap
 
-    # Painel de resíduos
+    # Residuals panel
     ax_res.scatter(y_true, residuals, c=c, cmap=cmap, s=point_size, alpha=0.7)
     ax_res.set_facecolor("#ffffff")
     ax_res.axhline(0, color='k', linestyle='--', linewidth=1)
@@ -244,7 +244,7 @@ def _plot_regression_with_residuals_panels(
     ax_res.tick_params(axis='y', labelsize=9)
     ax_res.set_xticks([])
 
-     # Painel principal
+     # Main panel
     ax_main.scatter(y_true, y_pred, c=c, cmap=cmap, s=point_size, alpha=0.7)
     ax_main.set_facecolor('#ffffff')
     minv, maxv = min(y_true.min(), y_pred.min()), max(y_true.max(), y_pred.max())
@@ -257,7 +257,7 @@ def _plot_regression_with_residuals_panels(
     ax_main.set_ylabel(ylabel, fontsize=10)
     ax_main.tick_params(axis='both', labelsize=9)
 
-    # Exibir métricas como texto
+    # Display metrics as text
     if metrics_str is not None:
         ax_main.text(
             0.01, 0.99, metrics_str, transform=ax_main.transAxes,
@@ -272,10 +272,10 @@ def plot_feature_importance(df_feat, param, figsize=(8, 6), n_top_features=10):
     Plota gráfico horizontal de importância das features.
     
     Args:
-        df_feat: DataFrame com colunas 'feature' e 'importance'
-        param: nome do parâmetro
-        figsize: tamanho da figura
-        n_top_features: número de features mais importantes a exibir
+        df_feat: DataFrame with 'feature' and 'importance' columns
+        param: parameter name
+        figsize: figure size
+        n_top_features: number of top features to display
     """
     df_plot = df_feat.sort_values('importance', ascending=False).head(n_top_features)
     features = df_plot['feature']
@@ -301,7 +301,7 @@ def plot_feature_importance(df_feat, param, figsize=(8, 6), n_top_features=10):
     plt.show()
 
 def plot_test_graphs(predictions, true_values, bins, cmap_name, param_string, param_unit, n_ticks, legend):
-    """Plota gráficos de teste para avaliação de modelo."""
+    """Plots test graphs for model evaluation."""
     if not bins:
         bins = [min(true_values) - 1, max(true_values) + 1]
 
@@ -348,7 +348,7 @@ def plot_test_graphs(predictions, true_values, bins, cmap_name, param_string, pa
     return fig
 
 def plot_comparison_graph(results, metric, error, cmap_name, param_unit, n_ticks, legend):
-    """Plota gráfico de comparação entre diferentes modelos/configurações."""
+    """Plots comparison graph between different models/configurations."""
     fig = plt.figure(figsize=(3 * len(results[next(iter(results))]), 5))
     ax = fig.add_axes([0, 0, 1, 1])
     n_bars = len(results)
@@ -379,7 +379,7 @@ def plot_comparison_graph(results, metric, error, cmap_name, param_unit, n_ticks
     return fig
 
 def beautify_graph(ax, x_limits, y_limits, x_n_ticks, y_n_ticks, x_label, y_label, grid=None):
-    """Aplica estilo padronizado aos gráficos."""
+    """Applies standardized styling to plots."""
     if x_limits:
         ax.set_xlim(x_limits[0], x_limits[1])
         ax.set_xticks(np.linspace(x_limits[0], x_limits[1], x_n_ticks))
@@ -394,7 +394,7 @@ def beautify_graph(ax, x_limits, y_limits, x_n_ticks, y_n_ticks, x_label, y_labe
     return ax
 
 def round_to_n(x, n):
-    """Arredonda número para n dígitos significativos."""
+    """Rounds number to n significant digits."""
     return round(x, -int(floor(log10(abs(x)))) + n - 1)
 
 def plot_handles(ax, m, c):
@@ -403,7 +403,7 @@ def plot_handles(ax, m, c):
 
 def plot_bolometric_correction(y_true, y_pred, point_size=8, metrics_json_path=None, model_type='XGB'):
     """
-    Gera gráfico de regressão para correção bolométrica com estilo específico.
+    Generates regression plot for bolometric correction with specific style.
     """
     _set_times_font()
     
@@ -411,7 +411,7 @@ def plot_bolometric_correction(y_true, y_pred, point_size=8, metrics_json_path=N
     y_pred = np.array(y_pred)
     r2, mad, sigma, residuals = _calculate_metrics(y_true, y_pred)
     
-    # Carregar métricas de JSON se disponível
+    # Load metrics from JSON if available
     metrics_str = None
     if metrics_json_path is not None and os.path.exists(metrics_json_path):
         try:
@@ -423,7 +423,7 @@ def plot_bolometric_correction(y_true, y_pred, point_size=8, metrics_json_path=N
     else:
         metrics_str = f"R² = {r2:.4f} | MAD = {mad:.3f} mag"
     
-    # Criar figura com painel de resíduos
+    # Create figure with residuals panel
     fig = plt.figure(figsize=(6, 6))
     gs = fig.add_gridspec(2, 1, height_ratios=[0.5, 3.5], hspace=0.05)
     ax_main = fig.add_subplot(gs[1])
@@ -431,7 +431,7 @@ def plot_bolometric_correction(y_true, y_pred, point_size=8, metrics_json_path=N
     ax_res.tick_params(labelbottom=False)
     fig.subplots_adjust(left=0.12, right=0.96, top=0.98, bottom=0.08, hspace=0.05)
     
-    # Definir cor baseada no tipo de modelo
+    # Define color based on model type
     color = 'MediumVioletRed' if model_type.upper() == 'XGB' else 'MediumOrchid'
     ax_res.scatter(y_true, residuals, c=color, s=point_size, alpha=0.7)
     ax_res.set_facecolor("#ffffff")
@@ -442,11 +442,11 @@ def plot_bolometric_correction(y_true, y_pred, point_size=8, metrics_json_path=N
     ax_res.tick_params(axis='y', labelsize=8)
     ax_res.tick_params(axis='x', which='both', bottom=False, top=False)
     
-    # Painel principal
+    # Main panel
     ax_main.scatter(y_true, y_pred, c=color, s=point_size, alpha=0.7)
     ax_main.set_facecolor('#ffffff')
     
-    # Linha 1:1
+    # 1:1 line
     minv, maxv = min(y_true.min(), y_pred.min()), max(y_true.max(), y_pred.max())
     ax_main.plot([minv, maxv], [minv, maxv], 'k-', lw=1, zorder=2)
     
@@ -457,7 +457,7 @@ def plot_bolometric_correction(y_true, y_pred, point_size=8, metrics_json_path=N
     ax_main.set_ylabel('BC Predicted (mag)', fontsize=10)
     ax_main.tick_params(axis='both', labelsize=9)
     
-    # Exibir métricas como texto (sem legend/bolinha)
+    # Display metrics as text (no legend/marker)
     ax_main.text(
         0.01, 0.99, metrics_str if metrics_str is not None else f"R² Score: {r2:.4f}",
         transform=ax_main.transAxes, fontsize=10, va='top', ha='left',
@@ -467,5 +467,5 @@ def plot_bolometric_correction(y_true, y_pred, point_size=8, metrics_json_path=N
 
         
 def show(fig):
-    """Exibe o gráfico gerado (figura matplotlib)."""
+    """Displays the generated plot (matplotlib figure)."""
     plt.show(fig)

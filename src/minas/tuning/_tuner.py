@@ -13,22 +13,22 @@ from datetime import datetime
 
 
 
-# Função utilitária para busca de hiperparâmetros para Random Forest ou XGBoost
+# Utility function for hyperparameter search for Random Forest or XGBoost
 def hyperparameter_search(X, Y, model_type, param_dist, tuning_id, k_values=None, test_size=0.25, n_iter=20, cv=3, n_jobs=-1, random_state=42, save_dir='pipeline'):
     """
-    Executa RandomizedSearchCV para Random Forest (RF) ou XGBoost (XGB), usando MAD como métrica principal.
-    O usuário define a grade de hiperparâmetros (param_dist) e os valores de k (k_values).
-    O melhor pipeline é salvo como <tuning_id>.joblib no diretório save_dir.
+    Executes RandomizedSearchCV for Random Forest (RF) or XGBoost (XGB), using MAD as primary metric.
+    User defines hyperparameter grid (param_dist) and k values (k_values).
+    Best pipeline is saved as <tuning_id>.joblib in save_dir directory.
 
-    Parâmetros:
-        X, Y: dados de entrada e saída
-        model_type: 'RF' para RandomForest ou 'XGB' para XGBoost
-        param_dist: dicionário de hiperparâmetros para RandomizedSearchCV
-        tuning_id: nome do arquivo salvo
-        k_values: lista de valores de k para SelectKBest (opcional)
-        test_size, n_iter, cv, n_jobs, random_state, save_dir: parâmetros de controle
+    Parameters:
+        X, Y: input and output data
+        model_type: 'RF' for RandomForest or 'XGB' for XGBoost
+        param_dist: hyperparameter dictionary for RandomizedSearchCV
+        tuning_id: saved file name
+        k_values: list of k values for SelectKBest (optional)
+        test_size, n_iter, cv, n_jobs, random_state, save_dir: control parameters
 
-    Retorna:
+    Returns:
         best_pipeline, random_search
     """
     if not os.path.exists(save_dir):
@@ -42,7 +42,7 @@ def hyperparameter_search(X, Y, model_type, param_dist, tuning_id, k_values=None
     # Split
     X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=test_size, random_state=random_state)
 
-    # Remover linhas com valores ausentes em X ou Y
+    # Remove rows with missing values in X or Y
     train_mask = ~(X_train.isnull().any(axis=1) | Y_train.isnull())
     X_train = X_train[train_mask]
     Y_train = Y_train[train_mask]
@@ -60,7 +60,7 @@ def hyperparameter_search(X, Y, model_type, param_dist, tuning_id, k_values=None
         raise ValueError('model_type deve ser "RF" ou "XGB"')
     pipeline = Pipeline(steps)
 
-    # Função para calcular o MAD
+    # Function to calculate MAD
     def mad_score(y_true, y_pred):
         return np.median(np.abs(y_true - y_pred))
 
@@ -85,9 +85,9 @@ def hyperparameter_search(X, Y, model_type, param_dist, tuning_id, k_values=None
 
     best_pipeline = random_search.best_estimator_
 
-    # Salvar pipeline com nome tuning_id
+    # Save pipeline with tuning_id name
     pipeline_path = os.path.join(save_dir, f'{tuning_id}.joblib')
     joblib.dump(best_pipeline, pipeline_path)
-    # print(f'Modelo salvo em: {pipeline_path}')
+    # print(f'Model saved at: {pipeline_path}')
 
     return best_pipeline, random_search

@@ -1,12 +1,13 @@
 #
 <p align="center">
-  <img src="logo/logo_black.png" alt="MINAS logo" width="500"/>
+  <img src="logo/logo_black.png" alt="MINAS logo" width="430"/>
 </p>
 
 # MINAS - Machine-learning INtegrated analysis with photometric Astronomical Surveys
 
-
-## English
+[![PyPI version](https://badge.fury.io/py/minas.svg)](https://badge.fury.io/py/minas)
+[![Python](https://img.shields.io/pypi/pyversions/minas)](https://pypi.org/project/minas/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 MINAS was developed to assist and facilitate the complete Machine Learning workflow for astronomical photometric surveys. The package integrates all stages of the process, from preprocessing to final model application.
 
@@ -44,7 +45,7 @@ MINAS was developed to assist and facilitate the complete Machine Learning workf
 
 Install the package (recommended):
 ```bash
-pip install /path/to/minas
+pip install minas
 ```
 
 > **Note:**
@@ -104,7 +105,7 @@ Two Machine Learning algorithms were trained to predict bolometric correction:
 #### Performance Plots
 
 <p align="center">
-  <img src="src/minas/bolometric/graphs/BC_pred_XGB.png" alt="XGBoost Performance" width="49.26%"/>
+  <img src="src/minas/bolometric/graphs/BC_pred_XGB.png" alt="XGBoost Performance" width="49.245%"/>
   <img src="src/minas/bolometric/graphs/BC_pred_RF.png" alt="Random Forest Performance" width="49%"/>
 </p>
 
@@ -150,149 +151,13 @@ Pull requests and suggestions are welcome! Please follow the package's modularit
 
 This package is distributed under the MIT license. For questions, open an issue in the repository.
 
+If you use MINAS in your research, please cite the package and the grid(s) you used:
 
-## Português
-
-MINAS foi desenvolvido para auxiliar e facilitar o fluxo de trabalho completo de análises de Machine Learning em levantamentos fotométricos astronômicos. O pacote integra todas as etapas do processo, desde o pré-processamento até a aplicação final dos modelos.
-
-> **Curiosidade:** MINAS também é o nome de um estado brasileiro (Minas Gerais), terra natal de Icaro Meidem, criador do pacote. Como um orgulhoso mineiro, o nome representa tanto o foco astronômico quanto a herança pessoal.
-
-### Principais Características
-- **Fluxo de trabalho completo**: Integra pré-processamento, seleção de features, busca de hiperparâmetros e aplicação de modelos em um único pacote.
-- **Random Forest e XGBoost integrados**: Pipelines otimizados para classificação e regressão com as principais bibliotecas de ML, facilmente extensível para outros algoritmos.
-- **Seleção inteligente de features**: Utiliza Permutation Importance para identificar as características mais relevantes automaticamente.
-- **Busca de hiperparâmetros**: Ferramentas integradas para otimização de modelos com grid search e random search.
-- **Aplicação com Monte Carlo**: Propagação de erros fotométricos usando simulações de Monte Carlo durante a predição.
-- **Reconhecimento automático de filtros**: Suporte nativo aos filtros dos principais levantamentos fotométricos, como J-PAS, J-PLUS, S-PLUS, GAIA, WISE, GALEX.
-- **Correção bolométrica**: Modelos pré-treinados para cálculo de correção bolométrica baseados em Teff, log g e [Fe/H].
-- **Estrutura modular**: Fácil de adaptar, estender e integrar novos métodos ou bancos de dados.
-
-### Estrutura das Pastas
-
-- `evaluation/`  
-  Ferramentas para avaliação de modelos, métricas, gráficos e seleção de features (ex: permutation importance).
-- `models/`  
-  Implementação dos modelos Random Forest, XGBoost e utilitários para pipeline de machine learning.
-- `preprocess/`  
-  Funções para pré-processamento de dados, manipulação de catálogos, normalização, tratamento de valores ausentes, etc.
-- `tuning/`  
-  Métodos para busca de hiperparâmetros (grid search, random search) e integração com pipelines.
-- `bolometric/`  
-  Módulos para cálculo de correção bolométrica com modelos pré-treinados.
-- `__init__.py`  
-  Inicialização do pacote, definição de filtros reconhecidos, aliases de parâmetros e integração dos submódulos.
-- `setup.py` e `pyproject.toml`  
-  Arquivos de configuração para instalação do pacote no modo moderno (PEP 517/518).
-
-
-### Como Usar
-
-Instale o pacote normalmente:
-```bash
-pip install /caminho/para/minas
+```bibtex
+@software{minas,
+  author  = {Meidem, Icaro},
+  title   = {{MINAS}: Machine-learning INtegrated analysis with photometric Astronomical Surveys},
+  year    = {2025},
+  url     = {https://github.com/icaromeidem/minas},
+}
 ```
-
-> **Nota:**
-> Para ambientes modernos, a instalação editável (`-e`) pode não funcionar devido a mudanças no pip/setuptools. Prefira a instalação padrão, a menos que você realmente precise editar o código frequentemente.
-
-Importe no seu código:
-```python
-import minas as mg
-```
-
-Exemplo de uso:
-```python
-from minas.models import create_model
-model = create_model('RF')
-```
-
-### Exemplos
-
-A pasta `examples/` contém notebooks Jupyter completos demonstrando todo o fluxo de trabalho de ML:
-
-- **`data/`**: Preparação de dados e criação de catálogos
-  - `data_creation.ipynb`: Criação de datasets de treinamento a partir de levantamentos espectroscópicos
-  - `apply/data/data_prepare.ipynb`: Pré-processamento de dados para aplicação de modelos
-
-- **`tuning/`**: Otimização de hiperparâmetros e seleção de features
-  - `tuning_RF.ipynb` / `tuning_XGB.ipynb`: Busca em grade para hiperparâmetros ótimos
-  - `feature_import_RF.ipynb` / `feature_import_XGB.ipynb`: Análise de permutation importance
-  - `pipeline/`: Configurações personalizadas de pipeline
-
-- **`training/`**: Treinamento e avaliação de modelos
-  - `predict_RF_all.ipynb` / `predict_XGB_all.ipynb`: Treinamento de modelos para Teff, log g e [Fe/H]
-  - `graphs_XGB_all.ipynb`: Visualização de resultados e métricas de desempenho
-  - `models/`: Modelos treinados salvos (XGB, RF)
-  - `predicts/`: Métricas de predição e resultados de validação
-  - `graphs_results/`: Gráficos de desempenho por parâmetro
-  - `graphs_matrix/`: Matrizes de confusão e gráficos de correlação
-
-- **`apply/`**: Aplicação de modelos treinados em novos dados
-  - `apply_models_XGB.ipynb` / `apply_models_RF.ipynb`: Aplicação de modelos com propagação de erros via Monte Carlo
-  - `pred_results/`: Predições finais com incertezas
-
-Esses notebooks fornecem um template completo para estimativa de parâmetros estelares a partir de dados fotométricos.
-
-### Correção Bolométrica
-
-O MINAS inclui modelos pré-treinados para cálculo de correção bolométrica (BC) baseados nas correções apresentadas por Jordi et al. (2010), que fornece dados de BC para estrelas observadas pelo Gaia com base em Teff, log g e [Fe/H].
-
-#### Modelos Disponíveis
-
-Dois algoritmos de Machine Learning foram treinados para prever a correção bolométrica:
-
-| Modelo | R² Score | MAD | Desvio Padrão |
-|--------|-----|-----|---------------|
-| **Random Forest** | 0.9970 | 0.0067 mag | 0.0573 mag |
-| **XGBoost** | 0.9983 | 0.0062 mag | 0.0430 mag |
-
-#### Gráficos de Desempenho
-
-<p align="center">
-  <img src="src/minas/bolometric/graphs/BC_pred_XGB.png" alt="XGBoost Performance" width="49.26%"/>
-  <img src="src/minas/bolometric/graphs/BC_pred_RF.png" alt="Random Forest Performance" width="49%"/>
-</p>
-
-*Figura: Desempenho dos modelos XGBoost (esquerda) e Random Forest (direita) para predição de correção bolométrica.*
-
-#### Como Usar
-
-```python
-import minas as mg
-
-# Aplicar correção bolométrica com XGBoost
-df = mg.bolometric.apply_bc(
-    data='your_catalog.csv',
-    teff_col='Teff',
-    logg_col='logg',
-    feh_col='[M/H]',
-    model_type='XGB',  # ou 'RF'
-    sigma_multiplier=3.0,  # Multiplicador do desvio padrão para incerteza
-    output_file='catalog_with_bc.csv'
-)
-```
-
-#### Incertezas
-
-A incerteza da BC é calculada como `σ_BC = multiplicador × desvio_padrão`, onde o multiplicador é escolhido pelo usuário (padrão: 3.0). As estatísticas são validadas automaticamente com base na amostra de validação incluída no pacote, mostrando a porcentagem de objetos dentro dos limites de erro especificados.
-
-#### Referência
-
-Jordi, C., Gebran, M., Carrasco, J. M., et al. (2010). *Gaia broad band photometry*. Astronomy & Astrophysics, 523, A48. DOI: [10.1051/0004-6361/200913234](https://doi.org/10.1051/0004-6361/200913234)
-
-### Extensibilidade
-- Você pode adicionar novos algoritmos de ML criando módulos em `models/` e integrando ao pipeline.
-- Novos filtros ou levantamentos podem ser adicionados editando o dicionário `FILTERS` no `__init__.py`.
-
-### Contribuição
-Pull requests e sugestões são bem-vindos! Siga o padrão de modularidade e documentação do pacote.
-
-### Autor
-- Icaro Meidem
-- Contato: icarosilva@on.br
-
-
----
-
-Este pacote é distribuído sob a licença MIT. Para dúvidas, abra uma issue no repositório.
-
