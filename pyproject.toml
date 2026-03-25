@@ -58,7 +58,8 @@ Repository    = "https://github.com/icaromeidem/minas"
 "Bug Tracker" = "https://github.com/icaromeidem/minas/issues"
 
 [tool.setuptools.packages.find]
-where   = ["src"]
+where = ["."]
+include = ["minas*"]
 
 [tool.setuptools.package-data]
 minas = [

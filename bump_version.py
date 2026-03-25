@@ -24,6 +24,6 @@ version = get_version()
 p = pathlib.Path("pyproject.toml")
 p.write_text(re.sub(r'^version = ".*"', f'version = "{version}"', p.read_text(), flags=re.MULTILINE))
 
-pathlib.Path("src/minas/_version.py").write_text(f'__version__ = "{version}"\n')
+pathlib.Path("minas/_version.py").write_text(f'__version__ = "{version}"\n')
 
 print(f"✓ version set to {version}")
