@@ -1,7 +1,7 @@
 """
 bump_version.py
 ---------------
-Reads the latest Git tag and writes the version to src/minas/_version.py
+Reads the latest Git tag and writes the version to minas/_version.py
 and pyproject.toml. Run before building: python bump_version.py
 """
 
@@ -22,8 +22,7 @@ def get_version():
 version = get_version()
 
 p = pathlib.Path("pyproject.toml")
-p.write_text(re.sub(r'^version = ".*"', f'version = "{version}"', p.read_text(), flags=re.MULTILINE))
-
+p.write_text(re.sub(r'^version\s*=\s*".*"', f'version     = "{version}"', p.read_text(), flags=re.MULTILINE))
 pathlib.Path("minas/_version.py").write_text(f'__version__ = "{version}"\n')
 
 print(f"✓ version set to {version}")
